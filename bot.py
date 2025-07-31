@@ -1,33 +1,36 @@
 import telebot
 from config import TOKEN
 from logic import *
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from telegram import CallbackQuery
+from logic import SPORT
+
 
 bot = telebot.TeleBot(token=TOKEN)
-
-SPORTS = ["Football", "Basketball", "Tennis", "Running", "Swimming"]
 user_choices = {}
 
 @bot.message_handler(commands=["go"])
-def start(message):
+def go(message):
     bot.send_message(message.chat.id, f"Привет, Я бот который выберет твой любимый спорт,")
 
 @bot.message_handler(commands=['help'])
 def help(message):
     bot.send_message(message.chat.id, f"Напиши /start если хочешь начать" )
 
-def send_question(chat_id):
-    bot.send_message(chat_id, SPORTS[user_choices[chat_id]].text, reply_markup=SPORTS[user_choices[chat_id]].gen_markup())
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    user_id = message.chat.id
-    user_choices[user_id] = []
+    chat_id = message.chat.id
+    user_choices[chat_id] = []
 
-    markup = InlineKeyboardMarkup(inline_keyboard=[])
-    markup.row_width = len(self.options)
-    
-# Callback query handler for buttons
+    question = SPORT(
+        "Выбери 3 любимые виды спорта:",
+        *SPORT.SPORTS
+    )
+    bot.send_message(chat_id, question.text, reply_markup=question.gen_markup())
+        
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def handle_selection(call: CallbackQuery):
     user_id = call.from_user.id
